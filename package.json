@@ -1,0 +1,16 @@
+{
+  "name": "smart-todo-app",
+  "version": "1.0.0",
+  "description": "Smart To-Do List Web Application - BCA Project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5"
+  }
+}

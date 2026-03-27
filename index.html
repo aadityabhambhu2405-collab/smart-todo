@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — Smart To-Do App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════ AUTH SCREEN ═══════════════════ -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-bg">
+      <div class="auth-orb auth-orb-1"></div>
+      <div class="auth-orb auth-orb-2"></div>
+      <div class="auth-orb auth-orb-3"></div>
+    </div>
+
+    <div class="auth-container">
+      <div class="auth-brand">
+        <div class="brand-icon">✦</div>
+        <h1>TaskFlow</h1>
+        <p>Smart To-Do List — BCA Project</p>
+      </div>
+
+      <!-- Login Form -->
+      <div id="login-form" class="auth-card active">
+        <h2>Welcome back</h2>
+        <p class="auth-sub">Sign in to your workspace</p>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" />
+        </div>
+        <div id="login-error" class="auth-error hidden"></div>
+        <button class="btn-primary" onclick="handleLogin()">Sign In →</button>
+        <p class="auth-switch">Don't have an account? <a onclick="toggleAuth()">Create one</a></p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form" class="auth-card">
+        <h2>Create account</h2>
+        <p class="auth-sub">Join TaskFlow today</p>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="reg-username" placeholder="yourname" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" placeholder="you@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" placeholder="Min. 6 characters" />
+        </div>
+        <div id="reg-error" class="auth-error hidden"></div>
+        <button class="btn-primary" onclick="handleRegister()">Create Account →</button>
+        <p class="auth-switch">Already have an account? <a onclick="toggleAuth()">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ MAIN APP ═══════════════════ -->
+  <div id="app" class="app hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-mini">
+          <span class="brand-icon-mini">✦</span>
+          <span>TaskFlow</span>
+        </div>
+        <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+      </div>
+
+      <!-- User Info -->
+      <div class="user-card">
+        <div class="user-avatar" id="sidebar-avatar">A</div>
+        <div class="user-info">
+          <span class="user-name" id="sidebar-username">User</span>
+          <span class="user-email" id="sidebar-email">email</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="sidebar-stats">
+        <div class="stat-pill stat-total">
+          <span id="stat-total">0</span>
+          <small>Total</small>
+        </div>
+        <div class="stat-pill stat-done">
+          <span id="stat-done">0</span>
+          <small>Done</small>
+        </div>
+        <div class="stat-pill stat-pending">
+          <span id="stat-pending">0</span>
+          <small>Pending</small>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <nav class="sidebar-nav">
+        <p class="nav-label">VIEWS</p>
+        <a class="nav-item active" data-filter="all" onclick="setFilter('all', this)">
+          <span class="nav-icon">◈</span> All Tasks
+          <span class="nav-badge" id="badge-all">0</span>
+        </a>
+        <a class="nav-item" data-filter="today" onclick="setFilter('today', this)">
+          <span class="nav-icon">◉</span> Due Today
+          <span class="nav-badge" id="badge-today">0</span>
+        </a>
+        <a class="nav-item" data-filter="pending" onclick="setFilter('pending', this)">
+          <span class="nav-icon">◌</span> Pending
+          <span class="nav-badge" id="badge-pending">0</span>
+        </a>
+        <a class="nav-item" data-filter="completed" onclick="setFilter('completed', this)">
+          <span class="nav-icon">◍</span> Completed
+          <span class="nav-badge" id="badge-done">0</span>
+        </a>
+        <a class="nav-item nav-overdue" data-filter="overdue" onclick="setFilter('overdue', this)">
+          <span class="nav-icon">⚠</span> Overdue
+          <span class="nav-badge danger" id="badge-overdue">0</span>
+        </a>
+      </nav>
+
+      <!-- Categories -->
+      <div class="sidebar-cats">
+        <div class="cats-header">
+          <p class="nav-label">CATEGORIES</p>
+          <button onclick="openCatModal()" class="btn-add-cat" title="Add category">＋</button>
+        </div>
+        <div id="category-list" class="category-list"></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" onclick="logout()">⎋ Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="hamburger" onclick="toggleSidebar()">☰</button>
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="search-input" placeholder="Search tasks..." oninput="debounceSearch()" />
+          </div>
+        </div>
+        <div class="topbar-right">
+          <select id="sort-select" onchange="loadTasks()" class="sort-select">
+            <option value="created_at">Newest First</option>
+            <option value="due_date">Due Date</option>
+            <option value="priority">Priority</option>
+            <option value="title">Alphabetical</option>
+          </select>
+          <button class="btn-new-task" onclick="openTaskModal()">＋ New Task</button>
+        </div>
+      </header>
+
+      <!-- Page Title -->
+      <div class="page-header">
+        <h2 id="page-title">All Tasks</h2>
+        <div class="priority-filters">
+          <button class="pf-btn active" data-p="all" onclick="setPriority('all', this)">All</button>
+          <button class="pf-btn high" data-p="high" onclick="setPriority('high', this)">🔴 High</button>
+          <button class="pf-btn medium" data-p="medium" onclick="setPriority('medium', this)">🟡 Medium</button>
+          <button class="pf-btn low" data-p="low" onclick="setPriority('low', this)">🟢 Low</button>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-section">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
+        <span class="progress-label" id="progress-label">0% complete</span>
+      </div>
+
+      <!-- Task List -->
+      <div id="task-list" class="task-list"></div>
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">✦</div>
+        <h3>No tasks here</h3>
+        <p>Click <strong>+ New Task</strong> to get started</p>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════ TASK MODAL ═══════════════════ -->
+  <div id="task-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">New Task</h3>
+        <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Task Title <span class="req">*</span></label>
+          <input type="text" id="task-title" placeholder="What needs to be done?" maxlength="120" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="task-desc" placeholder="Add details..." rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="task-priority">
+              <option value="high">🔴 High</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select id="task-category"></select>
+          </div>
+          <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="task-due" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Subtasks</label>
+          <div id="subtask-inputs">
+            <div class="subtask-row">
+              <input type="text" placeholder="Add a subtask..." class="subtask-inp" />
+              <button onclick="addSubtaskInput()" class="btn-sub-add">＋</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
+        <button class="btn-primary" id="modal-save-btn" onclick="saveTask()">Save Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SUBTASK MODAL ═══════════════════ -->
+  <div id="subtask-modal" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 id="subtask-modal-title">Subtasks</h3>
+        <button class="modal-close" onclick="closeSubtaskModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="subtask-list-view"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeSubtaskModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ CATEGORY MODAL ═══════════════════ -->
+  <div id="cat-modal" class="modal-overlay hidden">
+    <div class="modal modal-xs">
+      <div class="modal-header">
+        <h3>New Category</h3>
+        <button class="modal-close" onclick="closeCatModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="cat-name" placeholder="Category name" />
+        </div>
+        <div class="form-group">
+          <label>Color</label>
+          <input type="color" id="cat-color" value="#6366f1" class="color-input" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeCatModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveCategory()">Add Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ TOAST ═══════════════════ -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
